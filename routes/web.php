@@ -14,3 +14,11 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::post('auth/register', 'UserController@register');
+Route::post('auth/login', 'UserController@authenticate');
+Route::get('open', 'DataController@open');
+
+Route::group(['middleware' => ['jwt.verify']], function() {
+    Route::get('auth/user', 'UserController@getAuthenticatedUser');
+    Route::get('closed', 'DataController@closed');
+});
