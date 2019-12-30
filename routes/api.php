@@ -15,12 +15,26 @@ use Illuminate\Http\Request;
 Route::post('auth/login', 'APIController@login');
 Route::post('auth/register', 'APIController@register');
 
-Route::group(['middleware' => 'auth.api'], function () {
+Route::group(['middleware' => 'auth.jwt'], function () {
     Route::get('auth/logout', 'APIController@logout');
+    Route::get('api/auth/refresh', 'APIController@refresh');
     Route::get('/auth/user', function (Request $request) {
         $data = $request->user();
         $data->username = implode('',explode(' ',$data->name));
         return $data;
+    });
+
+    Route::group(['prefix'=>'v1'],function(){
+
+       Route::post('admin/users/index','Api\UserController@index');
+       Route::post('admin/users','Api\UserController@create');
+        Route::group(['prefix'=>'admin','namespace'=>'Api\admin'],function(){
+            Route::get('notices','NoticeController@index');
+            Route::post('notices','NoticeController@store');
+            Route::get('notices/{id}','NoticeController@edit');
+            Route::delete('notices/{id}','NoticeController@destroy');
+        });
+       Route::post('auth/change-password','Api\UserController@changePassword');
     });
 });
 
