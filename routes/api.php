@@ -12,12 +12,13 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('admin/users/index','Api\UserController@index');
+Route::post('admin/users','Api\UserController@create');
 Route::post('auth/login', 'APIController@login');
 Route::post('auth/register', 'APIController@register');
-
 Route::group(['middleware' => 'auth.jwt'], function () {
     Route::get('auth/logout', 'APIController@logout');
-    Route::get('api/auth/refresh', 'APIController@refresh');
+    Route::get('/auth/refresh', 'APIController@refresh');
     Route::get('/auth/user', function (Request $request) {
         $data = $request->user();
         $data->username = implode('',explode(' ',$data->name));
@@ -26,10 +27,16 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 
     Route::group(['prefix'=>'v1'],function(){
 
-       Route::post('admin/users/index','Api\UserController@index');
-       Route::post('admin/users','Api\UserController@create');
+       Route::resource('admin/users','Api\UserController');
         Route::group(['prefix'=>'admin','namespace'=>'Api\admin'],function(){
             Route::get('notices','NoticeController@index');
+            Route::resource('branches','BranchController');
+            Route::resource('departments','DepartmentController');
+            Route::resource('institutes','InstituteController');
+            Route::resource('journaltypes','JournalTypeController');
+            Route::resource('locations','LocationController');
+            Route::resource('zones','ZoneController');
+
             Route::post('notices','NoticeController@store');
             Route::get('notices/{id}','NoticeController@edit');
             Route::delete('notices/{id}','NoticeController@destroy');

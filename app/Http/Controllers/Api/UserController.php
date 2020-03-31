@@ -16,9 +16,8 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::paginate(20);
+        $users = User::where('username','!=','superuser')->paginate(20);
         return $users;
-        return $request->all();
         //
 
     }
@@ -31,12 +30,7 @@ class UserController extends Controller
     public function create(Request $request)
     {
         //
-        User::create([
-           'name'=>$request->get('name'),
-            'email'=>$request->get('username'),
-            'role'=>$request->get('role'),
-            'password'=>Hash::make($request->get('password'))
-        ]);
+
     }
 
     /**
@@ -47,7 +41,9 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $user=User::firstOrcreate($request->all());
+        return response()->json($user);
     }
 
     /**
@@ -56,9 +52,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
         //
+        return $user;
     }
 
     /**
@@ -79,9 +76,12 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request,User $user)
     {
         //
+        $response = new \stdClass();
+        $response->success= $user->update($request->only('password'));
+        return response()->json($response);
     }
 
     /**
@@ -90,9 +90,13 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
         //
+        $response = new \stdClass();
+        $response->success= $user->delete();
+
+        return response()->json($response);
     }
 
     public function changePassword(Request $request){

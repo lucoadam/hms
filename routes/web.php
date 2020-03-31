@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 Route::post('auth/register', 'UserController@register');
 Route::post('auth/login', 'UserController@authenticate');
@@ -22,3 +22,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('auth/user', 'UserController@getAuthenticatedUser');
     Route::get('closed', 'DataController@closed');
 });
+
+//Auth::routes();
+//
+//Route::get('/home', 'HomeController@index')->name('home');

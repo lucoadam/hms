@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use http\Env\Response;
 use JWTAuth;
 use App\User;
 use Illuminate\Http\Request;
@@ -18,22 +19,31 @@ class APIController extends Controller
     */
     public function login(Request $request)
     {
-    $input = $request->only('email', 'password');
-    $token = null;
-
-    if (!$token = auth()->attempt($input)) {
-    return response()->json([
-    'success' => false,
-    'message' => 'Invalid Email or Password',
-    ], 401);
-    }
-    $headers =[
-        'Authorization'=>$token
-    ];
-    return response()->json([
-    'success' => true,
-    'token' => $token,
-    ],200,$headers);
+        $email=$request->get('username');
+        $input = $request->only( 'password');
+        $token = null;
+        if(User::where('username',$email)->exists()) {
+            $input['email']=User::where('username',$email)->first()->email;
+            if (!$token = auth()->attempt($input)) {
+                return response()->json([
+                    'success' => false,
+                    'from'=>'here',
+                    'message' => 'Invalid Username or Password',
+                ], 401);
+            }
+        }else{
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid Username or Password',
+            ], 401);
+        }
+        $headers =[
+            'Authorization'=>$token
+        ];
+        return response()->json([
+        'success' => true,
+        'token' => $token,
+        ],200,$headers);
     }
 
         public function refresh(Request $request)
